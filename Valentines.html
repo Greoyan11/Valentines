@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For Gelay ❤️</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ffd6e0, #fff0f5);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Floating hearts */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  color: #ff4d6d;
+  animation: floatUp 8s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 0.8; }
+  100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+}
+
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  animation: popIn 1s ease;
+  position: relative;
+  z-index: 2;
+}
+
+h1 {
+  color: #e63973;
+  font-size: 2.4rem;
+}
+
+.countdown {
+  margin-top: 10px;
+  color: #555;
+}
+
+.buttons {
+  margin-top: 30px;
+  position: relative;
+  height: 160px;
+}
+
+button {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#yes {
+  background-color: #ff4d6d;
+  color: white;
+}
+
+#no {
+  background-color: #adb5bd;
+  color: white;
+  position: absolute;
+  left: 180px;
+  top: 40px;
+}
+
+.music {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+
+<body onclick="startMusic()">
+
+<div class="container" id="main">
+  <h1>Gelay, will you be my Valentine? 💖</h1>
+
+  <div class="countdown" id="countdown"></div>
+
+  <div class="buttons" id="buttonArea">
+    <button id="yes" onclick="yesClicked()">Yes 💕</button>
+    <button id="no">No 😏</button>
+  </div>
+
+  <div class="music">
+    🎹 Soft piano playing… (tap anywhere to start)
+  </div>
+</div>
+
+<script>
+/* FLOATING HEARTS */
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "❤️";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = Math.random() * 20 + 15 + "px";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 8000);
+}
+setInterval(createHeart, 450);
+
+/* SMART RUNAWAY NO BUTTON */
+const noBtn = document.getElementById("no");
+const area = document.getElementById("buttonArea");
+
+area.addEventListener("mousemove", (e) => {
+  const rect = noBtn.getBoundingClientRect();
+  const distance = Math.hypot(
+    e.clientX - rect.left,
+    e.clientY - rect.top
+  );
+
+  if (distance < 100) {
+    const maxX = area.clientWidth - noBtn.offsetWidth;
+    const maxY = area.clientHeight - noBtn.offsetHeight;
+    noBtn.style.left = Math.random() * maxX + "px";
+    noBtn.style.top = Math.random() * maxY + "px";
+  }
+});
+
+/* YES MESSAGE */
+function yesClicked() {
+  document.getElementById("main").innerHTML = `
+    <h1>😌💘</h1>
+    <h2>
+      Gelay,<br><br>
+      I gave you a choice…<br><br>
+      but you really have no choice.<br><br>
+      You’re stuck with me.<br><br>
+      See you on <strong>Feb 14, 6:00 PM</strong><br>
+      at <strong>Kasa Palma, Makati</strong> ❤️
+    </h2>
+  `;
+}
+
+/* COUNTDOWN */
+const targetDate = new Date("February 14, 2026 18:00:00").getTime();
+setInterval(() => {
+  const now = new Date().getTime();
+  const diff = targetDate - now;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const mins = Math.floor((diff / (1000 * 60)) % 60);
+  document.getElementById("countdown").innerHTML =
+    `⏳ ${days} days, ${hrs} hrs, ${mins} mins until Feb 14`;
+}, 1000);
+
+/* PALAGI-INSPIRED PIANO */
+let audioStarted = false;
+function startMusic() {
+  if (audioStarted) return;
+  audioStarted = true;
+
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const gain = ctx.createGain();
+  gain.connect(ctx.destination);
+  gain.gain.value = 0.15;
+
+  const notes = [261.6, 293.7, 329.6, 392.0, 349.2, 329.6];
+
+  function playSequence() {
+    let time = ctx.currentTime;
+    notes.forEach((n, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = n;
+      osc.connect(gain);
+      osc.start(time + i * 0.6);
+      osc.stop(time + i * 0.6 + 1.2);
+    });
+  }
+
+  playSequence();
+  setInterval(playSequence, 4200);
+}
+</script>
+
+</body>
+</html>
